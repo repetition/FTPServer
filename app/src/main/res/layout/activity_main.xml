@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,23 +8,56 @@
     tools:context="com.example.su.myftpdemo.MainActivity">
 
     <EditText
-        android:visibility="gone"
         android:id="@+id/et"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:gravity="center"
-        android:hint="请输入本机ip地址:"/>
+        android:hint="请输入本机ip地址:"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/tv_read_conf"
+        />
+
+    <TextView
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:typeface="sans"
+        android:textColor="#E066FF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/tv_ip"
+        />
 
     <Button
+        android:id="@+id/btn_read_config"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:text="read_config" />
+
+    <Button
+        android:id="@+id/btn_config"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:text="config" />
+
+    <Button
+        android:layout_marginTop="20dp"
         android:id="@+id/btn"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:text="start"/>
+        android:text="start" />
 
     <Button
         android:id="@+id/btn_stop"
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
-        android:text="stop"/>
+        android:text="stop" />
 </LinearLayout>
