@@ -29,7 +29,13 @@ import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PasswordEncryptor;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 
 public class FTPServer extends Service {
 
@@ -60,41 +66,58 @@ public class FTPServer extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
-        Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        Intent intent1 = new Intent(this, FTPServer.class);
-
+        try {
+            Intent ftpIntent = new Intent(this, FTPServer.class);
 /*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             manager.createNotificationChannel(channel);
         }*/
-        PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, intent1, 0);
-        Notification.Builder noti = new Notification.Builder(this)
-                .setContentTitle("FTPServerRunning")
-                .setContentText("FTPServerRunning...")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(notificationIntent);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            noti.setChannelId(CHANNEL_ID);
+
+            Bundle bundle = intent.getExtras();
+            ip = bundle.getString("ip");
+
+            if (null == ip) {
+                ip = Utils.getLocalIpAddress();
+                Toast.makeText(this, ip, Toast.LENGTH_SHORT).show();
+            }
+            PendingIntent notificationIntent = PendingIntent.getActivity(this, 0, ftpIntent, 0);
+            Notification.Builder noti = new Notification.Builder(this)
+                    .setContentTitle("FTPServerRunning")
+                    .setContentText("ftp://"+ip+":8090")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentIntent(notificationIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                noti.setChannelId(CHANNEL_ID);
+            }
+            startForeground(123456, noti.build());
+
+            startFtpServer(ip);
+            Log.d(TAG, "ip" + ip + "port:" + PORT);
+            MyApplication.getHandler().sendEmptyMessage(1);
+            Log.d(TAG, "已经启动！------------------------------------------------------------------------");
+            Log.d(TAG, "onStartCommand");
+        } catch (Exception e) {
+            e.printStackTrace();
+            String s = exception(e);
+
+            try {
+                FileOutputStream fos = new FileOutputStream("/mnt/sdcard/ftp/e.txt");
+                fos.write(s.getBytes(Charset.forName("utf-8")));
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
         }
-        startForeground(123456, noti.build());
-
-        Bundle bundle = intent.getExtras();
-        ip = bundle.getString("ip");
-
-        startFtpServer(ip);
-        Log.d(TAG, "ip" + ip + "port:" + PORT);
-        MyApplication.getHandler().sendEmptyMessage(1);
-        Log.d(TAG, "已经启动！------------------------------------------------------------------------");
-        Log.d(TAG, "onStartCommand");
-        Toast.makeText(this, "onStartCommand", Toast.LENGTH_SHORT).show();
-
         return Service.START_REDELIVER_INTENT;
     }
 
@@ -123,7 +146,7 @@ public class FTPServer extends Service {
     /**
      * 开启FTP服务器
      *
-     * @param hostip 本机ip
+     * @param hostIp 本机ip
      */
     private void startFtpServer(String hostIp) {
         FtpServerFactory serverFactory = new FtpServerFactory();
@@ -141,9 +164,26 @@ public class FTPServer extends Service {
         mFtpServer = serverFactory.createServer();
         try {
             mFtpServer.start();
+            SharedPreferences.Editor editor = MyApplication.getContext().getSharedPreferences("conf", Context.MODE_PRIVATE).edit();
+            editor.putBoolean("isRun", true);
+            editor.commit();
             Log.d(TAG, "开启了FTP服务器  ip = " + hostip);
         } catch (Exception e) {
             e.printStackTrace();
+            SharedPreferences.Editor editor = MyApplication.getContext().getSharedPreferences("conf", Context.MODE_PRIVATE).edit();
+            editor.putBoolean("isRun", false);
+            editor.commit();
+            String s = exception(e);
+            try {
+                FileOutputStream fos = new FileOutputStream("/mnt/sdcard/ftp/e.txt");
+                fos.write(s.getBytes(Charset.forName("utf-8")));
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -155,11 +195,38 @@ public class FTPServer extends Service {
         if (mFtpServer != null) {
             mFtpServer.stop();
             mFtpServer = null;
+            SharedPreferences.Editor editor = MyApplication.getContext().getSharedPreferences("conf", Context.MODE_PRIVATE).edit();
+            editor.putBoolean("isRun", false);
+            editor.commit();
             mHandler.sendEmptyMessage(0x0002);
             Log.d(TAG, "关闭了FTP服务器 ip = " + ip);
         } else {
             mHandler.sendEmptyMessage(0x0004);
         }
+    }
+
+    /**
+     * 将异常信息转化成字符串
+     *
+     * @param t
+     * @return
+     * @throws IOException
+     */
+    private static String exception(Throwable t) {
+        if (t == null) {
+            return null;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            t.printStackTrace(new PrintStream(baos));
+        } finally {
+            try {
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return baos.toString();
     }
 
 }

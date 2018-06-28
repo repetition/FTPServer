@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         BasicConfigurator.configure();
     }
 
-    private Button mButton, btn_stop, btn_confg, bt_read;
+    private Button mButton, btn_stop, btn_confg, bt_read, mBTWebView, mBTServer;
     private EditText mEditText;
     private TextView mtv_Read_confg, mTv_ip;
     private static final String TAG = "FtpServerService";
@@ -71,27 +71,24 @@ public class MainActivity extends AppCompatActivity {
         mButton = (Button) findViewById(R.id.btn);
         btn_stop = (Button) findViewById(R.id.btn_stop);
         btn_confg = findViewById(R.id.btn_config);
+        mBTWebView = findViewById(R.id.btn_webView);
         mEditText = (EditText) findViewById(R.id.et);
         bt_read = findViewById(R.id.btn_read_config);
         mtv_Read_confg = findViewById(R.id.tv_read_conf);
         mTv_ip = findViewById(R.id.tv_ip);
+        mBTServer = findViewById(R.id.btn_server);
+
+        mBTWebView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //hostip = mEditText.getText().toString().trim();
-                        hostip = getLocalIpAddress();
-                        if (mFtpServer == null) {
-                            startFtpServer(hostip);
-                        } else {
-                            mHandler.sendEmptyMessage(0x0003);
-                        }
-                    }
-                }).start();*/
-
-
                 MainActivity.this.startService(intent);
                 mButton.setEnabled(false);
                 btn_stop.setEnabled(true);
@@ -102,16 +99,17 @@ public class MainActivity extends AppCompatActivity {
         btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        stopFtpServer();
-                    }
-                }).start();*/
                 MainActivity.this.stopService(intent);
                 btn_stop.setEnabled(false);
                 mButton.setEnabled(true);
                 isStartService = false;
+            }
+        });
+        mBTServer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                intent = new Intent(MainActivity.this, MinaActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -177,17 +175,15 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString("ip", getLocalIpAddress());
         intent.putExtras(bundle);
 
-
         SharedPreferences preferences = this.getSharedPreferences("conf", MODE_PRIVATE);
         boolean isRun = preferences.getBoolean("isRun", false);
         if (isRun) {
             btn_stop.setEnabled(true);
             mButton.setEnabled(false);
-        }
-        btn_stop.setEnabled(false);
 
+        }
         boolean isWrite = preferences.getBoolean("isWrite", false);
-        if (isWrite) {
+        if (!isWrite) {
             request();
         }
     }
@@ -195,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 创建服务器配置文件
      */
-    private void creatDirsFiles() throws IOException {
+    private void createDirsFiles() throws IOException {
         File dir = new File(dirname);
         if (!dir.exists()) {
             dir.mkdir();
@@ -276,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         // 如果这3个权限全都拥有, 则直接执行备份代码
         if (isAllGranted) {
             try {
-                creatDirsFiles();
+                createDirsFiles();
                 Toast.makeText(MainActivity.this, "写入配置！", Toast.LENGTH_SHORT).show();
                 SharedPreferences.Editor editor = this.getSharedPreferences("conf", MODE_PRIVATE).edit();
                 editor.putBoolean("isWrite", true);
@@ -347,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
                 // 如果所有的权限都授予了, 则执行备份代码
 
                 try {
-                    creatDirsFiles();
+                    createDirsFiles();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

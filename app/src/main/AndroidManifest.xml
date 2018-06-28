@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -26,14 +27,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".WebViewActivity" />
+        <activity android:name=".MinaActivity" />
 
         <service android:name=".FTPServer" />
 
 
-        <receiver
-            android:name=".BootReceiver"
-            >
-            <intent-filter android:priority="1000" >
+        <receiver android:name=".BootReceiver">
+            <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>

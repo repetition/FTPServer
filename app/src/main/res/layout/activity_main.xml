@@ -16,48 +16,60 @@
         android:visibility="gone" />
 
     <TextView
+        android:id="@+id/tv_read_conf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:id="@+id/tv_read_conf"
-        />
+        android:gravity="center" />
 
     <TextView
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:typeface="sans"
-        android:textColor="#E066FF"
+        android:id="@+id/tv_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/tv_ip"
-        />
+        android:textColor="#E066FF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
 
     <Button
         android:id="@+id/btn_read_config"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="read_config" />
 
     <Button
         android:id="@+id/btn_config"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="config" />
 
     <Button
-        android:layout_marginTop="20dp"
         android:id="@+id/btn"
         android:layout_width="100dp"
         android:layout_height="60dp"
+        android:layout_marginTop="10dp"
         android:text="start" />
 
     <Button
         android:id="@+id/btn_stop"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="stop" />
+
+    <Button
+        android:id="@+id/btn_webView"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:text="webView" />
+
+    <Button
+        android:id="@+id/btn_server"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:text="server" />
 </LinearLayout>

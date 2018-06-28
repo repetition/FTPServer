@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TabHost;
 import android.widget.Toast;
 
 public class BootReceiver extends BroadcastReceiver {
@@ -24,7 +23,7 @@ public class BootReceiver extends BroadcastReceiver {
                     /* 服务开机自启动 */
                     Intent ftpIntent = new Intent(context, FTPServer.class);
                     Bundle bundle = new Bundle();
-                    String localIpAddress = MainActivity.getLocalIpAddress();
+                    String localIpAddress = Utils.getLocalIpAddress();
                     bundle.putString("id", localIpAddress);
                     ftpIntent.putExtras(bundle);
                     ComponentName componentName = context.startService(ftpIntent);
